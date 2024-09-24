@@ -98,7 +98,7 @@ export default function PhishingGame() {
   const pickRandomPair = async (images) => {
     const pair = getRandomPair(images, usedImages);
     if (!pair) {
-      endGame();
+      endGame(); // 모든 이미지를 사용했을 때 게임 종료
       return;
     }
     try {
@@ -112,23 +112,26 @@ export default function PhishingGame() {
       setError("Failed to load images. Please try again.");
     }
   };
-
+  
   const handleChoice = (chosenImage) => {
     if (chosenImage.isReal) {
       setScore((prevScore) => ({
         ...prevScore,
         correct: prevScore.correct + 1,
       }));
-      pickRandomPair(imageData.images);
     } else {
       setScore((prevScore) => ({
         ...prevScore,
         incorrect: prevScore.incorrect + 1,
       }));
-      endGame();
     }
+    pickRandomPair(imageData.images);
   };
-
+  
+  const endGame = () => {
+    setGameOver(true);
+    setGameStarted(false);
+  };
   const startGame = () => {
     setScore({ correct: 0, incorrect: 0 });
     setGameOver(false);
@@ -137,10 +140,7 @@ export default function PhishingGame() {
     pickRandomPair(imageData.images);
   };
 
-  const endGame = () => {
-    setGameOver(true);
-    setGameStarted(false);
-  };
+ 
 
   const restartGame = () => {
     startGame();
@@ -195,8 +195,7 @@ export default function PhishingGame() {
             <li>두 개의 웹사이트 이미지가 제시됩니다.</li>
             <li>하나는 진짜 사이트, 다른 하나는 가짜(피싱) 사이트입니다.</li>
             <li>제한 시간 6초 안에 진짜 사이트 이미지를 클릭하세요.</li>
-            <li>정답을 맞히면 다음 라운드로 진행됩니다.</li>
-            <li>틀리거나 시간이 초과되면 게임이 종료됩니다.</li>
+          
             <li>최대한 많은 라운드를 맞혀 고득점을 노려보세요!</li>
           </ol>
         </div>
@@ -221,7 +220,8 @@ export default function PhishingGame() {
             role="alert"
           >
             <p className="font-bold">남은 시간: {timeLeft}초</p>
-            <p>점수: {score.correct}</p>
+            <p>맞춘 개수: {score.correct}</p>
+          <p>틀린 개수: {score.incorrect}</p>
           </div>
           {currentPair && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
